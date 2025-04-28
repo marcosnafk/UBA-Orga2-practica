@@ -3,6 +3,7 @@
         "stdlib.h": "c",
         "stdio.h": "c",
         "stdint.h": "c",
-        "helper.h": "c"
+        "helper.h": "c",
+        "memoria.h": "c"
     }
 }

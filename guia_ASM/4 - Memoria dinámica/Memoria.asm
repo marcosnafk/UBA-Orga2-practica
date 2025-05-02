@@ -2,6 +2,8 @@ extern malloc
 extern free
 extern fprintf
 
+TAMANIO EQU 3
+
 section .data
 
 section .text
@@ -15,15 +17,68 @@ global strLen
 ; ** String **
 
 
+; void strPrint(char* a, FILE* pFile)
+; a[rdi] pFile[rsi]
+strPrint:
+	push rbp
+	mov rbp, RSP
+
+	push R12
+	push R13
+	push R14
+	push R15
 
 
+	xor r13, r13
 
-; void strDelete(char* a)
-strDelete:
+	mov r12, rdi ; char* a  
+	mov r13, rsi ; FILE* pFile  
+
+	call strLen ; ya tenemos el parametro en rdi
+	; rax tiene el tamanio en eax
+	mov r14d, eax
+
+	cmp r14d, 0
+	je .tagStringVacio
+
+	mov rdi, R13 ;FILE*
+	mov rsi, R12 ;char*
+	call fprintf
+
+	jmp .tagReturn
+
+	.tagStringVacio: ; escribir NULL, siendo R12 el char* y R13 el FILE*
+		mov rdi, R13
+		mov rsi, R12
+		mov byte[rsi], 78
+		mov byte[rsi+1], 85
+		mov byte[rsi+2], 76
+		mov byte[rsi+3], 76
+		mov byte[rsi+4], 0
+		call fprintf
+
+
+	.tagReturn:
+
+
+	pop R12
+	pop R13
+	pop R14
+	pop R15
+	pop rbp
+
 	ret
 
-; void strPrint(char* a, FILE* pFile)
-strPrint:
+; void strDelete(char* a)
+; a [rdi] 8 bytes
+strDelete:
+	push rbp
+	mov rbp, RSP
+
+	call free
+
+	pop rbp
+
 	ret
 
 ; uint32_t strLen(char* a)
@@ -71,6 +126,7 @@ strCmp:
 		cmp cl, 0
 		je .tagReturn ; si ambos terminaron vamos a return
 
+		
 		; comparamos cada char
 		mov cl, [rdi]
 		mov dl, [rsi]
@@ -87,11 +143,11 @@ strCmp:
 		jmp .tagWhile
 
 		.tagLesser:
-			mov rax, 1
+			mov eax, 1
 			jmp .tagReturn
 		
 		.tagGreater:
-			mov rax, -1
+			mov eax, -1
 			jmp .tagReturn
 
 	.tagReturn:
